@@ -8,7 +8,7 @@ mp_hands=mp.solutions.hands
 mp_drawing=mp.solutions.drawing_utils
 
 hands=mp_hands.Hands(
-    max_num_hands=1,
+    max_num_hands=2,
     min_detection_confidence=0.5,
     min_tracking_confidence=0.5
 )
@@ -40,7 +40,22 @@ while cap.isOpened():
         for res in result.multi_hand_landmarks:
             joint = np.zeros((21,3))
             for j,lm in enumerate(res.landmark):
-                print(lm)
+                joint[j]=[lm.x,lm.y,lm.z]
+            v1=joint[[0,1,2,3,0,5,6,7,0,9,10,11,0,13,14,15,0,17,18,19],:]
+            v2=joint[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],:]
+            v=v2-v1
+            
+            v=v/np.expand_dims(np.linalg.norm(v,axis=1),axis=-1)
+            
+            angle=np.arccos(np.einsum('nt,nt->n',
+                                    v[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],:],
+                                     v[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],:]))
+            angle=np.degrees(angle)
+            angle=np.expand_dims(angle.astype(np.float32),axis=0)
+
+            ret, results, neighbours, dist = knn.findNearest(angle, 3)
+            print(results)
+            
             mp_drawing.draw_landmarks(img,res,mp_hands.HAND_CONNECTIONS)
     cv2.imshow('result',img)
     if cv2.waitKey(1)==ord('q'):
