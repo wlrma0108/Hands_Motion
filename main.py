@@ -41,15 +41,15 @@ while cap.isOpened():
             joint = np.zeros((21,3))
             for j,lm in enumerate(res.landmark):
                 joint[j]=[lm.x,lm.y,lm.z]
-            v1=joint[[0,1,2,3,0,5,6,7,0,9,10,11,0,13,14,15,0,17,18,19],:]
-            v2=joint[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],:]
+            v1 = joint[[0,1,2,3,0,5,6,7,0,9,10,11,0,13,14,15,0,17,18,19],:] # Parent joint
+            v2 = joint[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20],:] # Child joint
             v=v2-v1
             
             v=v/np.expand_dims(np.linalg.norm(v,axis=1),axis=-1)
             
             angle=np.arccos(np.einsum('nt,nt->n',
-                                    v[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18],:],
-                                     v[[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19],:]))
+                                    v[[0,1,2,4,5,6,8,9,10,12,13,14,16,17,18],:],
+                                    v[[1,2,3,5,6,7,9,10,11,13,14,15,17,18,19],:]))
             angle=np.degrees(angle)
             angle=np.expand_dims(angle.astype(np.float32),axis=0)
 
