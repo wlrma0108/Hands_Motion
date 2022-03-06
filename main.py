@@ -7,6 +7,11 @@ import numpy as np
 mp_hands=mp.solutions.hands
 mp_drawing=mp.solutions.drawing_utils
 
+gesture = {
+    0:'fist', 1:'one', 2:'two', 3:'three', 4:'four', 5:'five',
+    6:'six', 7:'rock', 8:'spiderman', 9:'yeah', 10:'ok',
+}
+
 hands=mp_hands.Hands(
     max_num_hands=2,
     min_detection_confidence=0.5,
@@ -31,7 +36,6 @@ while cap.isOpened():
         break
     
     
-    img=cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
     img=cv2.flip(img,1)
     
     result=hands.process(img)
@@ -54,8 +58,13 @@ while cap.isOpened():
             angle=np.expand_dims(angle.astype(np.float32),axis=0)
 
             ret, results, neighbours, dist = knn.findNearest(angle, 3)
-            print(results)
+            idx=int(results[0][0])
+            gesture_name=gesture[idx]
             
+            cv2.putText(img,text=gesture_name,org=(10,50),fontFace=cv2.
+            FONT_HERSHEY_SIMPLEX,fontScale=2,color=(0,0,0),thickness=2)
+            
+                        
             mp_drawing.draw_landmarks(img,res,mp_hands.HAND_CONNECTIONS)
     cv2.imshow('result',img)
     if cv2.waitKey(1)==ord('q'):
